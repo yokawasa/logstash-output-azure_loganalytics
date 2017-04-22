@@ -17,6 +17,9 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   # The name of the event type that is being submitted to Log Analytics. This must be only alpha characters.
   config :log_type, :validate => :string, :required => true
 
+  # The name of the time generated field. Be carefule that the value of field should strictly follow the ISO 8601 format (YYYY-MM-DDThh:mm:ssZ)
+  config :time_generated_field, :validate => :string, :default => ''
+
   # list of Key names in in-coming record to deliver.
   config :key_names, :validate => :array, :default => []
   
@@ -81,7 +84,7 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
     end
 
     begin
-      res = @client.post_data(@log_type, documents)
+      res = @client.post_data(@log_type, documents, @time_generated_field)
       if not Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
         $logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (documents.to_json).to_s)
       end

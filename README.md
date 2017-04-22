@@ -29,6 +29,7 @@ output {
  * **customer\_id (required)** - Your Operations Management Suite workspace ID
  * **shared\_key (required)** - The primary or the secondary Connected Sources client authentication key.
  * **log\_type (required)** - The name of the event type that is being submitted to Log Analytics. This must be only alpha characters. 
+ * **time\_generated\_field (optional)** - Default:''(empty string) The name of the time generated field. Be carefule that the value of field should strictly follow the ISO 8601 format (YYYY-MM-DDThh:mm:ssZ). See also [this](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-data-collector-api#create-a-request) for more details
  * **key\_names (optional)** - Default:[] (empty array). list of Key names in in-coming record to deliver.
  * **flush_items (optional)** - Default 50. Max number of items to buffer before flushing (1 - 1000).
  * **flush_interval_time (optional)** - Default 5. Max number of seconds to wait between flushes.
