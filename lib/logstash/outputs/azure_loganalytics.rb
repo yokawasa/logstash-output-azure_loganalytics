@@ -86,10 +86,10 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
     begin
       res = @client.post_data(@log_type, documents, @time_generated_field)
       if not Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
-        $logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (documents.to_json).to_s)
+        @logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (documents.to_json).to_s)
       end
     rescue Exception => ex
-      $logger.error("Exception occured in posting to DataCollector API: '#{ex}', data=>" + (documents.to_json).to_s)
+      @logger.error("Exception occured in posting to DataCollector API: '#{ex}', data=>" + (documents.to_json).to_s)
     end
 
   end # def flush
