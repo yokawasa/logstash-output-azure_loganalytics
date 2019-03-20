@@ -1,3 +1,6 @@
+## 0.2.2
+* Fix logging failure [PR#6](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/6) (Thanks to [@daniel-chambers](https://github.com/daniel-chambers))
+
 ## 0.2.1
 
 * Updated gem dependencies to allow compatibility with Logstash 5 + 6 (Thanks to [@arthurtoper](https://github.com/arthurtoper))
