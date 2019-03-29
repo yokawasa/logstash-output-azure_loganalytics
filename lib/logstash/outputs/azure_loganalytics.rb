@@ -80,12 +80,16 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
 
     # Skip in case there are no candidate documents to deliver
     if documents.length < 1
+      @logger.debug("No documents in batch for log type #{@log_type}. Skipping")
       return
     end
 
     begin
+      @logger.debug("Posting log batch (log count: #{documents.length}) as log type #{@log_type} to DataCollector API. First log: " + (documents[0].to_json).to_s)
       res = @client.post_data(@log_type, documents, @time_generated_field)
-      if not Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
+      if Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
+        @logger.debug("Successfully posted logs as log type #{@log_type} with result code #{res.code} to DataCollector API")
+      else
         @logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (documents.to_json).to_s)
       end
     rescue Exception => ex
