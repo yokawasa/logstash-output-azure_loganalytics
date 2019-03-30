@@ -115,6 +115,37 @@ Here is an expected output for sample input (Apache2 access log):
 }
 ```
 
+## Debugging
+If you need to debug and watch what this plugin is sending to Log Analytics, you can change the logstash log level for this plugin to `DEBUG` to get additional logs in the logstash logs.
+
+One way of changing the log level is to use the logstash API:
+
+```
+> curl -XPUT 'localhost:9600/_node/logging?pretty' -H "Content-Type: application/json" -d '{ "logger.logstash.outputs.azureloganalytcs" : "DEBUG" }'
+{
+  "host" : "yoichitest01",
+  "version" : "6.5.4",
+  "http_address" : "127.0.0.1:9600",
+  "id" : "d8038a9e-02c6-411a-9f6b-597f910edc54",
+  "name" : "yoichitest01",
+  "acknowledged" : true
+}
+```
+
+You should then be able to see logs like this in your logstash logs:
+
+```
+[2019-03-29T01:18:52,652][DEBUG][logstash.outputs.azureloganalytics] Posting log batch (log count: 50) as log type HealthCheckLogs to DataCollector API. First log: {"message":{"Application":"HealthCheck.API","Environments":{},"Name":"SystemMetrics","LogLevel":"Information","Properties":{"CPU":3,"Memory":83}},"beat":{"version":"6.5.4","hostname":"yoichitest01","name":"yoichitest01"},"timestamp":"2019-03-29T01:18:51.901Z"}
+
+[2019-03-29T01:18:52,819][DEBUG][logstash.outputs.azureloganalytics] Successfully posted logs as log type HealthCheckLogs with result code 200 to DataCollector API
+```
+
+Once you're done, you can use the logstash API to undo your log level changes:
+
+```
+> curl -XPUT 'localhost:9600/_node/logging/reset?pretty'
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/yokawasa/logstash-output-azure_loganalytics.
