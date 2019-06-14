@@ -19,7 +19,8 @@ output {
         customer_id => "<OMS WORKSPACE ID>"
         shared_key => "<CLIENT AUTH KEY>"
         log_type => "<LOG TYPE NAME>"
-        key_names  => ['key1','key2','key3'..] ## list of Key names (array)
+        key_names  => ['key1','key2','key3'..] ## list of Key names
+        key_types => {'key1'=> 'string' 'key2'=>'double' 'key3'=>'boolean' .. }
         flush_items => <FLUSH_ITEMS_NUM>
         flush_interval_time => <FLUSH INTERVAL TIME(sec)>
     }
@@ -30,9 +31,19 @@ output {
  * **shared\_key (required)** - The primary or the secondary Connected Sources client authentication key.
  * **log\_type (required)** - The name of the event type that is being submitted to Log Analytics. This must be only alpha characters. 
  * **time\_generated\_field (optional)** - Default:''(empty string) The name of the time generated field. Be carefule that the value of field should strictly follow the ISO 8601 format (YYYY-MM-DDThh:mm:ssZ). See also [this](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-data-collector-api#create-a-request) for more details
- * **key\_names (optional)** - Default:[] (empty array). list of Key names in in-coming record to deliver.
+ * **key\_names (optional)** - Default:[] (empty array). The list of key names in in-coming record that you want to submit to Log Analytics.
+ * **key\_types (optional)** - Default:{} (empty hash). The list of data types for each column as which you want to store in Log Analytics (`string`, `boolean`, or `double`)
+   * The key names in `key_types` param must be included in `key_names` param. The column data whose key isn't included in  `key_names` is treated as `string` data type.
+   * Multiple key value entries are separated by `spaces` rather than commas (See also [this](https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html#hash))
+   * If you want to store a column as datetime or guid data format, set `string` for the column ( the value of the column should be `YYYY-MM-DDThh:mm:ssZ format` if it's `datetime`, and `GUID format` if it's `guid`).
+   * In case that `key_types` param are not specified, all columns that you want to submit ( you choose with `key_names` param ) are stored as `string` data type in Log Analytics.
  * **flush_items (optional)** - Default 50. Max number of items to buffer before flushing (1 - 1000).
  * **flush_interval_time (optional)** - Default 5. Max number of seconds to wait between flushes.
+
+> [NOTE] There is a special param for changing the Log Analytics API endpoint (mainly for supporting Azure sovereign cloud)
+> * **endpoint (optional)** - Default: ods.opinsights.azure.com 
+
+Support custom log analytics API endpoint (for supporting Azure sovereign cloud)
 
 ## Tests
 

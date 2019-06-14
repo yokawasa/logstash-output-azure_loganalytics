@@ -1,3 +1,7 @@
+## 0.3.0
+* Support `key_types` param - [Issue#8](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/8)
+* Support custom log analytics API endpoint (for supporting Azure sovereign cloud) - [Issue#9](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/9)
+
 ## 0.2.3
 * Added additional debug logging for successful requests - [PR#7](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/7) by [@daniel-chambers](https://github.com/daniel-chambers)
 
