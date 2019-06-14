@@ -43,8 +43,6 @@ output {
 > [NOTE] There is a special param for changing the Log Analytics API endpoint (mainly for supporting Azure sovereign cloud)
 > * **endpoint (optional)** - Default: ods.opinsights.azure.com 
 
-Support custom log analytics API endpoint (for supporting Azure sovereign cloud)
-
 ## Tests
 
 Here is an example configuration where Logstash's event source and destination are configured as Apache2 access log and Azure Log Analytics respectively.
