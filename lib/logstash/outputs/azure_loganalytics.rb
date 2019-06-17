@@ -88,7 +88,9 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
       document = {}
       event_hash = event.to_hash()
       if @key_names.length > 0
-        @key_names.each do |key|
+        # Get the intersection of key_names and keys of event_hash
+        keys_intersection = @key_names & event_hash.keys
+        keys_intersection.each do |key|
           if event_hash.include?(key)
             if @key_types.include?(key)
               document[key] = convert_value(@key_types[key], event_hash[key])

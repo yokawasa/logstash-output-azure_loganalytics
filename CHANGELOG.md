@@ -1,3 +1,6 @@
+## 0.3.1
+* Performance optimization for large key_names list scenario - [Issue#10](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/10)
+
 ## 0.3.0
 * Support `key_types` param - [Issue#8](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/8)
 * Support custom log analytics API endpoint (for supporting Azure sovereign cloud) - [Issue#9](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/9)
