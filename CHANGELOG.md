@@ -1,3 +1,6 @@
+## 0.3.2
+* Improvement: removed unnecessary key check 
+
 ## 0.3.1
 * Performance optimization for large key_names list scenario - [Issue#10](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/10)
 
