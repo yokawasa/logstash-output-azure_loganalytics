@@ -91,12 +91,10 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
         # Get the intersection of key_names and keys of event_hash
         keys_intersection = @key_names & event_hash.keys
         keys_intersection.each do |key|
-          if event_hash.include?(key)
-            if @key_types.include?(key)
-              document[key] = convert_value(@key_types[key], event_hash[key])
-            else
-              document[key] = event_hash[key]
-            end
+          if @key_types.include?(key)
+            document[key] = convert_value(@key_types[key], event_hash[key])
+          else
+            document[key] = event_hash[key]
           end
         end
       else
