@@ -1,3 +1,6 @@
+## 0.4.0
+* Change base [azure-loganalytics-datacollector-api](https://github.com/yokawasa/azure-log-analytics-data-collector) to ">= 0.4.0"
+
 ## 0.3.2
 * Improvement: removed unnecessary key check 
 
