@@ -1,6 +1,9 @@
-## 0.5.0
+## 0.5.1
 
 * Change base [azure-loganalytics-datacollector-api](https://github.com/yokawasa/azure-log-analytics-data-collector) to ">= 0.5.0"
+
+## 0.5.0
+
 * Support sprintf syntax like `%{my_log_type}` for `log_type` config param - [Issue #13](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/13)
 
 ## 0.4.0
