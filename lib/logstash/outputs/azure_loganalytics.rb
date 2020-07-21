@@ -16,7 +16,8 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   config :shared_key, :validate => :string, :required => true
 
   # The name of the event type that is being submitted to Log Analytics. 
-  # This must be only alpha characters.
+  # This must only contain alpha numeric and _, and not exceed 100 chars. 
+  # sprintf syntax like %{my_log_type} is supported.
   config :log_type, :validate => :string, :required => true
 
   # The service endpoint (Default: ods.opinsights.azure.com)
@@ -50,10 +51,9 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   def register
     require 'azure/loganalytics/datacollectorapi/client'
 
-    ## Configure
-    if not @log_type.match(/^[[:alpha:]]+$/)
-      raise ArgumentError, 'log_type must be only alpha characters' 
-    end
+    #if not @log_type.match(/^[[:alpha:]]+$/)
+    #  raise ArgumentError, 'log_type must be only alpha characters' 
+    #end
 
     @key_types.each { |k, v|
       t = v.downcase
@@ -75,6 +75,7 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
 
   public
   def receive(event)
+    @log_type = event.sprintf(@log_type)
     # Simply save an event for later delivery
     buffer_receive(event)
   end # def receive

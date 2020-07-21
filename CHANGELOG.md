@@ -1,20 +1,31 @@
+## 0.5.0
+
+* Change base [azure-loganalytics-datacollector-api](https://github.com/yokawasa/azure-log-analytics-data-collector) to ">= 0.5.0"
+* Support sprintf syntax like `%{my_log_type}` for `log_type` config param - [Issue #13](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/13)
+
 ## 0.4.0
+
 * Change base [azure-loganalytics-datacollector-api](https://github.com/yokawasa/azure-log-analytics-data-collector) to ">= 0.4.0"
 
 ## 0.3.2
+
 * Improvement: removed unnecessary key check 
 
 ## 0.3.1
+
 * Performance optimization for large key_names list scenario - [Issue#10](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/10)
 
 ## 0.3.0
+
 * Support `key_types` param - [Issue#8](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/8)
 * Support custom log analytics API endpoint (for supporting Azure sovereign cloud) - [Issue#9](https://github.com/yokawasa/logstash-output-azure_loganalytics/issues/9)
 
 ## 0.2.3
+
 * Added additional debug logging for successful requests - [PR#7](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/7) by [@daniel-chambers](https://github.com/daniel-chambers)
 
 ## 0.2.2
+
 * Fix logging failure - [PR#6](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/6) by [@daniel-chambers](https://github.com/daniel-chambers)
 
 ## 0.2.1
