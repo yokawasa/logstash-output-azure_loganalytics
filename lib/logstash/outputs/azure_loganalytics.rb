@@ -51,10 +51,6 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   def register
     require 'azure/loganalytics/datacollectorapi/client'
 
-    #if not @log_type.match(/^[[:alpha:]]+$/)
-    #  raise ArgumentError, 'log_type must be only alpha characters' 
-    #end
-
     @key_types.each { |k, v|
       t = v.downcase
       if ( !t.eql?('string') && !t.eql?('double') && !t.eql?('boolean') ) 
@@ -75,7 +71,6 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
 
   public
   def receive(event)
-    @log_type = event.sprintf(@log_type)
     # Simply save an event for later delivery
     buffer_receive(event)
   end # def receive
@@ -84,9 +79,16 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   public
   def flush (events, close=false)
   
-    documents = []  #this is the array of hashes to add Azure Log Analytics
+    documentsByLogType = {}  # This is a map of log_type to list of documents (themselves maps) to send to Log Analytics
     events.each do |event|
       document = {}
+      
+      log_type_for_event = event.sprintf(@log_type)
+      if log_type_for_event.match(/[^a-zA-Z0-9_]/) or log_type_for_event.length > 100
+        @logger.error("Unable to process event, rendered log_type must only contain alphanumeric and underscore chars and be <= 100 chars long. Was: '" + log_type_for_event + "', Event data => " + (event.to_json).to_s)
+        next
+      end
+
       event_hash = event.to_hash()
       if @key_names.length > 0
         # Get the intersection of key_names and keys of event_hash
@@ -104,26 +106,32 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
       # Skip if document doesn't contain any items
       next if (document.keys).length < 1
 
-      documents.push(document)
+      if documentsByLogType[log_type_for_event] == nil then
+        documentsByLogType[log_type_for_event] = []
+      end
+      documentsByLogType[log_type_for_event].push(document)
     end
 
     # Skip in case there are no candidate documents to deliver
-    if documents.length < 1
-      @logger.debug("No documents in batch for log type #{@log_type}. Skipping")
+    if documentsByLogType.length < 1
+      @logger.debug("No documents in batch. Skipping")
       return
     end
 
-    begin
-      @logger.debug("Posting log batch (log count: #{documents.length}) as log type #{@log_type} to DataCollector API. First log: " + (documents[0].to_json).to_s)
-      res = @client.post_data(@log_type, documents, @time_generated_field)
-      if Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
-        @logger.debug("Successfully posted logs as log type #{@log_type} with result code #{res.code} to DataCollector API")
-      else
-        @logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (documents.to_json).to_s)
+    documentsByLogType.each do |log_type_for_events, events|
+      begin
+        @logger.debug("Posting log batch (log count: #{events.length}) as log type #{log_type_for_events} to DataCollector API. First log: " + (events[0].to_json).to_s)
+        res = @client.post_data(log_type_for_events, events, @time_generated_field)
+        if Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
+          @logger.debug("Successfully posted logs as log type #{log_type_for_events} with result code #{res.code} to DataCollector API")
+        else
+          @logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (events.to_json).to_s)
+        end
+      rescue Exception => ex
+        @logger.error("Exception occured in posting to DataCollector API: '#{ex}', data=>" + (events.to_json).to_s)
       end
-    rescue Exception => ex
-      @logger.error("Exception occured in posting to DataCollector API: '#{ex}', data=>" + (documents.to_json).to_s)
     end
+    
   end # def flush
 
   private
