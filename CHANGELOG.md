@@ -1,3 +1,7 @@
+## 0.5.2
+
+* Fixed using sprintf in log_type - [PR #16](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/16) by [@daniel-chambers](https://github.com/daniel-chambers)
+
 ## 0.5.1
 
 * Change base [azure-loganalytics-datacollector-api](https://github.com/yokawasa/azure-log-analytics-data-collector) to ">= 0.5.0"
