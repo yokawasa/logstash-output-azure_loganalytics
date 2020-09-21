@@ -84,10 +84,6 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
       document = {}
       
       log_type_for_event = event.sprintf(@log_type)
-      if log_type_for_event.match(/[^a-zA-Z0-9_]/) or log_type_for_event.length > 100
-        @logger.error("Unable to process event, rendered log_type must only contain alphanumeric and underscore chars and be <= 100 chars long. Was: '" + log_type_for_event + "', Event data => " + (event.to_json).to_s)
-        next
-      end
 
       event_hash = event.to_hash()
       if @key_names.length > 0
