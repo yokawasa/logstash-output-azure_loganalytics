@@ -28,7 +28,7 @@ describe LogStash::Outputs::AzureLogAnalytics do
      azure_loganalytics_output.register
   end 
 
-  describe "#flush" do
+  describe "#multi_receive" do
     it "Should successfully send the event to Azure Log Analytics" do
       events = []
       log1 = {
@@ -61,11 +61,9 @@ describe LogStash::Outputs::AzureLogAnalytics do
 
       event1 =  LogStash::Event.new(log1) 
       event2 =  LogStash::Event.new(log2) 
-      azure_loganalytics_output.receive(event1)
-      azure_loganalytics_output.receive(event2)
       events.push(event1)
       events.push(event2)
-      expect {azure_loganalytics_output.flush(events)}.to_not raise_error
+      expect {azure_loganalytics_output.multi_receive(events)}.to_not raise_error
     end
   end
 
