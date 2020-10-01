@@ -1,3 +1,10 @@
+## 0.6.0
+
+* Multithreading support - [PR #17](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/17) by [@daniel-chambers](https://github.com/daniel-chambers)
+  * Big performance improvement
+  * New parame `max_batch_items` is added
+  * No longer `flush_items` and `flush_interval_time` params are supported in the plugin configuration
+
 ## 0.5.2
 
 * Fixed using sprintf in log_type - [PR #16](https://github.com/yokawasa/logstash-output-azure_loganalytics/pull/16) by [@daniel-chambers](https://github.com/daniel-chambers)
