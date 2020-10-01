@@ -21,8 +21,7 @@ output {
         log_type => "<LOG TYPE NAME>"
         key_names  => ['key1','key2','key3'..] ## list of Key names
         key_types => {'key1'=> 'string' 'key2'=>'double' 'key3'=>'boolean' .. }
-        flush_items => <FLUSH_ITEMS_NUM>
-        flush_interval_time => <FLUSH INTERVAL TIME(sec)>
+        max_batch_items => <MAX BATCH ITEMS (num)>
     }
 }
 ```
@@ -37,8 +36,7 @@ output {
    * Multiple key value entries are separated by `spaces` rather than commas (See also [this](https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html#hash))
    * If you want to store a column as datetime or guid data format, set `string` for the column ( the value of the column should be `YYYY-MM-DDThh:mm:ssZ format` if it's `datetime`, and `GUID format` if it's `guid`).
    * In case that `key_types` param are not specified, all columns that you want to submit ( you choose with `key_names` param ) are stored as `string` data type in Log Analytics.
- * **flush_items (optional)** - Default 50. Max number of items to buffer before flushing (1 - 1000).
- * **flush_interval_time (optional)** - Default 5. Max number of seconds to wait between flushes.
+ * **max_batch_items (optional)** - Default 50. Maximum number of log events to put in one request to Log Analytics.
 
 > [NOTE] There is a special param for changing the Log Analytics API endpoint (mainly for supporting Azure sovereign cloud)
 > * **endpoint (optional)** - Default: ods.opinsights.azure.com 

@@ -2,11 +2,9 @@
 
 require "logstash/outputs/base"
 require "logstash/namespace"
-require "stud/buffer"
+require "securerandom"
 
 class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
-  include Stud::Buffer
-
   config_name "azure_loganalytics"
 
   # Your Operations Management Suite workspace ID
@@ -41,11 +39,10 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
   #   key_types => {'key1'=>'string' 'key2'=>'string' 'key3'=>'boolean' 'key4'=>'double' ...}
   config :key_types, :validate => :hash, :default => {}
 
-  # Max number of items to buffer before flushing. Default 50.
-  config :flush_items, :validate => :number, :default => 50
-  
-  # Max number of seconds to wait between flushes. Default 5
-  config :flush_interval_time, :validate => :number, :default => 5
+  # Maximum number of log events to put in one request to Log Analytics
+  config :max_batch_items, :validate => :number, :default => 50
+
+  concurrency :shared
 
   public
   def register
@@ -61,24 +58,14 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
     ## Start 
     @client=Azure::Loganalytics::Datacollectorapi::Client::new(@customer_id,@shared_key,@endpoint)
 
-    buffer_initialize(
-      :max_items => @flush_items,
-      :max_interval => @flush_interval_time,
-      :logger => @logger
-    )
-
   end # def register
 
   public
-  def receive(event)
-    # Simply save an event for later delivery
-    buffer_receive(event)
-  end # def receive
+  def multi_receive(events)
+    
+    flush_guid = SecureRandom.uuid
+    @logger.debug("Start receive: #{flush_guid}. Received #{events.length} events")
 
-  # called from Stud::Buffer#buffer_flush when there are events to flush
-  public
-  def flush (events, close=false)
-  
     documentsByLogType = {}  # This is a map of log_type to list of documents (themselves maps) to send to Log Analytics
     events.each do |event|
       document = {}
@@ -115,20 +102,23 @@ class LogStash::Outputs::AzureLogAnalytics < LogStash::Outputs::Base
     end
 
     documentsByLogType.each do |log_type_for_events, events|
-      begin
-        @logger.debug("Posting log batch (log count: #{events.length}) as log type #{log_type_for_events} to DataCollector API. First log: " + (events[0].to_json).to_s)
-        res = @client.post_data(log_type_for_events, events, @time_generated_field)
-        if Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
-          @logger.debug("Successfully posted logs as log type #{log_type_for_events} with result code #{res.code} to DataCollector API")
-        else
-          @logger.error("DataCollector API request failure: error code: #{res.code}, data=>" + (events.to_json).to_s)
+      events.each_slice(@max_batch_items) do |event_batch|
+        begin
+          @logger.debug("Posting log batch (log count: #{event_batch.length}) as log type #{log_type_for_events} to DataCollector API. First log: " + (event_batch[0].to_json).to_s)
+          res = @client.post_data(log_type_for_events, event_batch, @time_generated_field)
+          if Azure::Loganalytics::Datacollectorapi::Client.is_success(res)
+            @logger.debug("Successfully posted logs as log type #{log_type_for_events} with result code #{res.code} to DataCollector API")
+          else
+            @logger.error("DataCollector API request failure (log type #{log_type_for_events}): error code: #{res.code}, data=>" + (event_batch.to_json).to_s)
+          end
+        rescue Exception => ex
+          @logger.error("Exception occured in posting to DataCollector API as log type #{log_type_for_events}: '#{ex}', data=>" + (event_batch.to_json).to_s)
         end
-      rescue Exception => ex
-        @logger.error("Exception occured in posting to DataCollector API: '#{ex}', data=>" + (events.to_json).to_s)
       end
     end
-    
-  end # def flush
+    @logger.debug("End receive: #{flush_guid}")
+
+  end # def multi_receive
 
   private
   def convert_value(type, val)
